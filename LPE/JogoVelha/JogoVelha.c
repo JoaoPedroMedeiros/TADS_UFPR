@@ -1,3 +1,8 @@
+/*=========================================================*/
+/* Aluno: João Pedro Medeiros de Farias                    */
+/* TADS NOTURNO                                            */
+/*=========================================================*/
+
 #include<stdio.h>
 #include <string.h>
 
@@ -20,8 +25,19 @@ struct jogador {
   jogada fncJogada;
 };
 
+//Estrutura de dados para partida
+struct Velha {
+ int partida;
+ char velha[3][3];
+ char resultado;
+};
+
 //Declaração das funções
 char jogar(int op, struct jogador *jog1, struct jogador *jog2);
+
+//Urls dos arquivos
+char arq_nomes[] = "nomes.txt";
+char arq_velha[] = "velha.dat";
 
 int jogada_usuario(int lin, int col, char jog) {
   if (lin < 0 || lin > 2 || col < 0 || col > 2)
@@ -239,12 +255,283 @@ void preenche_computador(struct jogador *computador) {
   (*computador).nivel = obtem_nivel();
 }
 
+void boas_vindas(char nome1[], char nome2[]) {
+  printf("==============================================================\n");
+  printf(" BEM-VINDO                                                    \n");
+  printf(" Como essa eh sua primeira vez, escolha o nome dos jogadores. \n");
+  printf("==============================================================\n");
+  
+  printf("Jogador 1: ");
+  scanf("%s", nome1);
+  fflush(stdin);
+  
+  printf("Jogador 2: ");
+  scanf("%s", nome2);
+  fflush(stdin);
+}
+
+
+int grava_jogadores(char url[], struct jogador jog1, struct jogador jog2) {
+  FILE *file;
+  file = fopen(url, "w");
+  if (file != NULL) {
+    fprintf(file, "%s ; %c ; %s ; %c\n", jog1.nome, jog1.simbolo, jog2.nome, jog2.simbolo);
+    fclose(file);
+    return 1;
+  }
+  return 0;
+}
+
+void copia_matriz(char m[3][3], char m2[3][3]) {
+  int i, j;
+  for (i = 0; i < 3; i++)
+    for (j = 0; j < 3; j++)
+      m[i][j] = m2[i][j];
+}
+
+int arquivo_existe(char arq[]) {
+  FILE *file;
+  file = fopen(arq, "r");
+  int existe = (file != NULL);
+  
+  if (existe)
+    fclose(file);
+    
+  return existe;
+}
+
+int tamanho_arq(FILE *file) {
+  int len;
+  fseek(file, 0, SEEK_END);
+  len = ftell(file);
+  fseek(file, 0, SEEK_SET);
+  return len;
+}
+
+int recupera_partidas(char url[], struct Velha **partidas) {
+  int len, n;
+  FILE *file;
+  
+  // Abre o arquivo
+  file = fopen(url, "rb");
+  
+  if (file != NULL) {
+    // Recupera o número de bytes dele
+    len = tamanho_arq(file);
+    // Recupera o numero de Velhas que existem dentro do arquivo
+    n = len / sizeof(struct Velha);
+    //Aloca o tamanho do vetor
+    *partidas = (struct Velha *) malloc(sizeof(struct Velha) * n);
+    // Coloca o conteudo da velha dentro da struct
+    fread(*partidas, sizeof(struct Velha), n, file);
+    //Fecha o arquivo
+    fclose(file);
+    //Retorna o numero de velhas encontradas no arquivo
+    return n;
+  }
+  return 0;
+}
+
+void recupera_partida(char url[], struct Velha *partida) {
+  
+  struct Velha *partidas;
+  int n;
+  
+  if (!arquivo_existe(url) || !(n = recupera_partidas(url, &partidas)))
+    (*partida).partida = 1;
+  else
+    (*partida).partida = partidas[n - 1].partida + 1;
+    
+  copia_matriz((*partida).velha, velha);
+}
+
+int grava_partida(char url[], struct Velha partida) {
+  
+  FILE *file;
+  
+  file = fopen(url, "ab");
+  
+  if (file != NULL)
+    fwrite (&partida, sizeof(struct Velha), 1, file);
+  else {
+    printf("Desculpe, houve um erro ao abrir o arquivo da partida. :/");
+    system("pause");
+  }
+  fclose(file);
+}
+
+void recupera_jogadores(char url[], struct jogador *jog1, struct jogador *jog2) {
+  
+  char nome1[15], nome2[15];
+  char simb1, simb2;
+  
+  FILE *file;
+  file = fopen(url, "r");
+  
+  if (file != NULL) {
+  
+    if (tamanho_arq(file) < 13) {
+	  printf("Desculpe, o arquivo de nomes está vazio. Abra o jogo novamente.\n\n");
+	  fclose(file);
+	  remove(arq_nomes);
+	  exit(0);
+	}
+  
+    fscanf(file, "%s ; %c ; %s ; %c\n", &nome1, &simb1, &nome2, &simb2);
+  
+    preenche_usuario(jog1, nome1);
+    preenche_usuario(jog2, nome2);
+  
+    (*jog1).simbolo = simb1;
+    (*jog2).simbolo = simb2;
+  }
+}
+
+void jogadores_campeonato(struct jogador *jog1, struct jogador *jog2) {
+  
+  char nome1[15], nome2[15];
+  
+  if (!arquivo_existe(arq_nomes)) {
+    system("cls");
+    boas_vindas(nome1, nome2);
+    
+    preenche_usuario(jog1, nome1);
+    preenche_usuario(jog2, nome2);
+    
+	escolha_simb(&(*jog1).simbolo, &(*jog2).simbolo);
+	
+	if (!(grava_jogadores(arq_nomes, *jog1, *jog2))) {
+	  printf("Desculpe, houve um erro ao gravar o nome dos jogadores :/");
+	  exit(0);
+	}
+  }
+  else
+    recupera_jogadores(arq_nomes, jog1, jog2);
+}
+
+void preenche_info_campeonato(int *vitoriasX, int *vitoriasO, int *nrPartidas) {
+  
+  struct Velha *partidas;
+  int n, i;
+  
+  *nrPartidas = recupera_partidas(arq_velha, &partidas);
+  
+  for (i = 0; i < *nrPartidas; i++) {
+  	*vitoriasX += partidas[i].resultado == 'X' ? 1 : 0; 
+  	*vitoriasO += partidas[i].resultado == 'O' ? 1 : 0;
+  }
+}
+
+void relatorio() {
+  
+  struct Velha *partidas;
+  struct jogador jog1, jog2;
+  int vitoriasX, vitoriasO, nrPartidas;
+  int i;
+  
+  vitoriasX = vitoriasO = nrPartidas = 0;
+  
+  nrPartidas = recupera_partidas(arq_velha, &partidas);
+  recupera_jogadores(arq_nomes, &jog1, &jog2);
+  
+  for (i = 0; i < nrPartidas; i++) {
+  	vitoriasX += partidas[i].resultado == 'X' ? 1 : 0; 
+  	vitoriasO += partidas[i].resultado == 'O' ? 1 : 0;
+  }
+  
+  system("cls");
+  
+  printf("|=====================================|\r\n");
+  printf("| Numero de partidas: %d               \r\n", nrPartidas);
+  printf("| Vitorias de %s (X): %d               \r\n", jog1.simbolo == 'X' ? jog1.nome : jog2.nome, vitoriasX);
+  printf("| Vitorias de %s (O): %d               \r\n", jog2.simbolo == 'O' ? jog2.nome : jog1.nome, vitoriasO);
+  printf("| Velhas: %d                           \r\n", nrPartidas - vitoriasX - vitoriasO);
+  printf("|=====================================|\r\n"); 
+ 
+  for (i = 0; i < nrPartidas; i++) {
+	printf("Partida numero %d ", partidas[i].partida);
+	if (partidas[i].resultado == 'V')
+	  printf("deu velha.\n");
+	else if (partidas[i].resultado == 'X')
+	  printf("%s ganhou.\n", jog1.simbolo == 'X' ? jog1.nome : jog2.nome);
+	else if (partidas[i].resultado == 'O')
+	  printf("%s ganhou.\n", jog1.simbolo == 'O' ? jog1.nome : jog2.nome);
+  	desenha_painel(partidas[i].velha);
+  	printf("\n");
+  }
+  
+  system("pause");
+}
+
+int recupera_partida_por_codigo(char url[], struct Velha *partida, int nrPartida) {
+  struct Velha *partidas;
+  int n, i;
+ 
+  n = recupera_partidas(url, &partidas);
+  
+  if (nrPartida <= n && nrPartida > 0) {
+    *partida = partidas[nrPartida - 1];
+    return 1;
+  }
+  return 0;
+}
+
+void pesquisar() {
+  
+  struct Velha partida;
+  struct jogador jog1, jog2;
+  int op;
+  
+  do {
+    system("cls");
+    
+    printf("Nr. da partida \n");
+    printf("Opcao: ");
+    scanf("%d", &op);
+    fflush(stdin);
+    
+    system("cls");
+    
+    printf("=========================================\n");
+    printf(" Buscando partida...                     \n");
+    printf("=========================================\n");
+    
+    recupera_jogadores(arq_nomes, &jog1, &jog2);
+    
+    if (recupera_partida_por_codigo(arq_velha, &partida, op)) {
+      printf("Partida numero %d ", partida.partida);
+      if (partida.resultado == 'V')
+        printf("deu velha.\n");
+      else if (partida.resultado == 'X')
+        printf("%s ganhou.\n", jog1.simbolo == 'X' ? jog1.nome : jog2.nome);
+      else if (partida.resultado == 'O')
+        printf("%s ganhou.\n", jog1.simbolo == 'O' ? jog1.nome : jog2.nome);
+      desenha_painel(partida.velha);
+      printf("\n");
+    }
+    else
+      printf("Partida %d nao existe\n\n", op);
+      
+    printf("Deseja buscar novamente?\n");
+    printf("1 - Sim, 2 - Nao\n");
+    
+    do {
+      printf("Opcao: ");
+      scanf("%d", &op);
+      fflush(stdin);
+    }
+    while (op < 1 && op > 2);
+  }
+  while (op == 1);
+}
+
 int main() {
   //Variáveis
   int op;
   int control;
   struct jogador jog1;
   struct jogador jog2;
+  struct Velha partida;
   char nome_jogador1[] = "Jogador 1";
   char nome_jogador2[] = "Jogador 2";
   
@@ -252,9 +539,14 @@ int main() {
   char vencedor;
   
   do {
+  	inicio:
+  	
+  	system("cls");
+  	
     //Recupera a opção de jogo
     //  1 - Player vs Player
     //  2 - Player vs Computador
+    //  3 - Campeonato                 
     op = menu();
   
     //Recupera a função de jogada de cada jogador
@@ -263,16 +555,39 @@ int main() {
     if (op == 1) {
       preenche_usuario(&jog1, nome_jogador1);
       preenche_usuario(&jog2, nome_jogador2);
+      escolha_simb(&jog1.simbolo, &jog2.simbolo);
     }
-    else {
+    else if (op == 2) {
       preenche_usuario(&jog1, nome_jogador1);
       preenche_computador(&jog2);
-    }
-  
-    //Recupera o símbolo de cada jogador
-    escolha_simb(&jog1.simbolo, &jog2.simbolo);
+      escolha_simb(&jog1.simbolo, &jog2.simbolo);
+    } 
+    else if (op == 3)
+      jogadores_campeonato(&jog1, &jog2);
+      
+    else if (op == 4) {
+      if (!arquivo_existe(arq_nomes) || !arquivo_existe(arq_velha)) {
+        printf("Inicie um campeonato para acessar essa opcao.\n\n");
+        system("pause");
+      }
+      else	
+	    relatorio();
+	  goto inicio;
+	}
+	else if (op == 5) {
+	  if (!arquivo_existe(arq_nomes) || !arquivo_existe(arq_velha)) {
+        printf("Inicie um campeonato para acessar essa opcao.\n\n");
+        system("pause");
+      }
+      else	
+	    pesquisar();
+	  goto inicio;
+	}
   
     vitoriasX = vitoriasO = nrPartidas = 0;
+  
+    if (op == 3)
+      preenche_info_campeonato(&vitoriasX, &vitoriasO, &nrPartidas);
   
     do {
       //Jogo
@@ -281,6 +596,13 @@ int main() {
       nrPartidas++;
       if (vencedor == 'X') vitoriasX++;
       if (vencedor == 'O') vitoriasO++;
+      
+      //Grava no arquivo binario
+      if (op == 3) {
+        recupera_partida(arq_velha, &partida);
+        partida.resultado = vencedor; 
+        grava_partida(arq_velha, partida);
+      }
       
       printf("Deseja jogar novamente?          \n");
       printf(" 1 - Jogar com as mesmas opcoes. \n");
@@ -353,7 +675,7 @@ char jogar(int op, struct jogador *jog1, struct jogador *jog2) {
   do {
   	system("cls");
   	desenha_placar((*jog1).simbolo == 'X' ? jog1 : jog2, (*jog2).simbolo == 'O' ? jog2 : jog1);
-	desenha_painel();
+	desenha_painel(velha);
   	
   	//Altera a vez do jogador
     jogAtual = jogAtual == jog1 ? jog2 : jog1;
@@ -363,7 +685,7 @@ char jogar(int op, struct jogador *jog1, struct jogador *jog2) {
     
     system("cls");
     desenha_placar((*jog1).simbolo == 'X' ? jog1 : jog2, (*jog2).simbolo == 'O' ? jog2 : jog1);
-	desenha_painel();
+	desenha_painel(velha);
   }
   //Repete o processo enquanto ninguém ganhar e a velha não estiver completa
   while (!verifica_ganhador((*jogAtual).simbolo) && !(completou = velha_completa()));
@@ -374,7 +696,7 @@ char jogar(int op, struct jogador *jog1, struct jogador *jog2) {
   }
   else {
     printf("Deu velha!\n");
-    return vazio;
+    return 'V';
   }
 }
 
@@ -382,15 +704,18 @@ int menu() {
   int op;
   
   printf("Selecione o estilo de jogo:\n");
-  printf(" 1. Player vs Player.      \n");
-  printf(" 2. Player vs Computador.  \n");
+  printf(" 1. Player vs Player       \n");
+  printf(" 2. Player vs Computador   \n");
+  printf(" 3. Campeonato             \n");
+  printf(" 4. Partidas               \n");
+  printf(" 5. Pesquisar partida      \n");
    
   do {
   	printf("Opcao: ");
     scanf("%d", &op);
     fflush(stdin);
   }
-  while (op != 1 && op != 2);
+  while (op < 1 && op > 5);
   
   return op;
 }
@@ -433,12 +758,12 @@ void desenha_placar(struct jogador *jogX, struct jogador *jogO) {
   printf("|=====================================|\r\n");
   printf("| Numero de partidas: %d               \r\n", nrPartidas);
   printf("| Vitorias de %s (X): %d               \r\n", (*jogX).nome, vitoriasX);
-  printf("| Vitorias de %s (X): %d               \r\n", (*jogO).nome, vitoriasO);
+  printf("| Vitorias de %s (O): %d               \r\n", (*jogO).nome, vitoriasO);
   printf("| Velhas: %d                           \r\n", nrPartidas - vitoriasX - vitoriasO);
   printf("|=====================================|\r\n"); 
 }
 
-void desenha_painel() {
+void desenha_painel(char v[3][3]) {
   int i, j;
   printf("|==============|\r\n");
   for (i = 0; i < 5; i++) {
@@ -449,7 +774,7 @@ void desenha_painel() {
 	    continue;
   	  }
 	  printf(" ");	
-	  printf("%c", velha[i/2][j] != vazio ? velha[i/2][j] : ' ');
+	  printf("%c", v[i/2][j] != vazio ? v[i/2][j] : ' ');
 	  if (j < 2)
 	    printf(" |");
     }
