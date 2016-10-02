@@ -8,15 +8,15 @@
  * A princípio está declarado como inteiro, entretanto, se for preciso alterá-lo,
  * a mudança será feita somente aqui.
  */
-typedef float Value;
+typedef int Value;
 
 /**
  * Constante estática utilizada para guardar a string de entrada de dados do valor.
  * Caso seja necessário alterar o tipo de dado de Value, só é preciso alterar seu
  * leitor aqui.
  */
-static const char SCANNER_ITEM[] = "%f";
-static const char PRINTER_ITEM[] = "%.2f";
+static const char SCANNER_ITEM[] = "%d";
+static const char PRINTER_ITEM[] = "%d";
 
 /**
  * Definição de um tipo de dado que representa uma posição XY dentro de
@@ -59,17 +59,6 @@ typedef struct positions {
 
 } Positions;
 
-/**
- * Definição do ponteiro para função de leitura de dados da matriz.
- */
-typedef (*Reader)(Value *value, int x, int y);
-
-/**
- * Função que recebe uma lista de Posições de matriz espersa e uma leitor de dados
- * e preenche a lista com os dados que forem diferentes de 0;
- */
-void parse(Positions *positions, Reader reader);
-
 /*========================================================================*/
 /* 1.0_dec - Funções referentes à manipulação da lista.
 /*========================================================================*/
@@ -89,19 +78,17 @@ void freePositions(Positions *positions);
 /* 2.0_dec - Funções referentes à manipulação da matriz
 /*========================================================================*/
 // 2.1_dec - Função que soma duas matrizes;
-int soma_matriz(Positions *matriz1, Positions *matriz2);
+Positions* soma_matriz(Positions *matriz1, Positions *matriz2);
 // 2.2_dec - Função que subtrai duas matrizes;
-int subtrai_matriz(Positions *matriz1, Positions *matriz2);
+Positions* subtrai_matriz(Positions *matriz1, Positions *matriz2);
 // 2.3_dec - Função que multiplica duas matrizes;
-int multiplica_matriz(Positions *matriz1, Positions *matriz2);
+Positions* multiplica_matriz(Positions *matriz1, Positions *matriz2);
 // 2.4_dec - Função que gera a matriz transposta;
-int aplica_transposta(Positions *matriz);
+Positions* aplica_transposta(Positions *matriz);
 // 2.5_dec - Função que imprime todos os dados da matriz, inclusive os zeros;
 int imprime_matriz(Positions *matriz);
 // 2.6_dec - Função que imprime os elementos da diagonal principal, inclusive os zeros caso existam.
 int imprime_diagonal_principal(Positions *matriz);
-// 2.7_dec - Função que imprime os elementos da diagonal secundária, inclusive os zeros caso existam.
-int imprime_diagonal_secundaria(Positions *matriz);
 
 /*========================================================================*/
 /* Funções assistentes
@@ -242,15 +229,67 @@ void find(Positions *positions) {
   saida_loop:;
 }
 
+void recupera_matriz_operacao(int maxX, int maxY, Positions *nova) {
+
+  int x, y;
+  Value value;
+
+  int opcao;
+
+  while (1) {
+    system("cls");
+    printf("Digite os itens da matriz para efetuar a operação\n");
+    printf("Máximo linhas.: %d\n", maxY);
+    printf("Máximo colunas: %d\n\n", maxX);
+
+    printf("Opções:\n");
+    printf(" 1. Adicionar\n");
+    printf(" 2. Mostrar matriz\n");
+    printf(" 3. Ver resultado\n\n");
+
+    opcao = op(1, 3, NULL);
+
+    if (opcao == 1) {
+      y = op(1, maxY, "Digite a linha.: ");
+      x = op(1, maxX, "Digite a coluna: ");
+
+      y--;
+      x--;
+
+      printf("Digite o valor.: ");
+      scanf(SCANNER_ITEM, &value);
+      fflush(stdin);
+
+      add(nova, newNode(value, x, y));
+    }
+    else if (opcao == 2) {
+      imprime_matriz(nova);
+      system("pause");
+    }
+    else
+      break;
+  }
+}
+
+void recupera_numero_colunas_multiplicacao(int *maxX) {
+  printf("Digite o número de colunas: ");
+  do {
+    scanf("%d", maxX);
+  }
+  while (*maxX < 1);
+}
+
 void main() {
   permite_acentuacao();
 
   Positions positions;
+  Positions operada;
+  Positions *resultado;
 
   //Inicializa a matriz.
   new(&positions, 0, 0);
 
-  int x, y;
+  int x, y, maxX;
   Value value;
 
   // Entra no menu principal e fica aqui até o usuário decidir sair.
@@ -283,49 +322,64 @@ void main() {
         find(&positions);
         break;
       case 5:
-        printf("Somar");
+        new(&operada, positions.lenX, positions.lenY);
+
+        recupera_matriz_operacao(positions.lenX, positions.lenY, &operada);
+        resultado = soma_matriz(&positions, &operada);
+
+        system("cls");
+
+        printf("RESULTADO:\n\n");
+        imprime_matriz(resultado);
+
+        freePositions(&operada);
+        freePositions(resultado);
+
         system("pause");
         break;
       case 6:
-        printf("Subtrair");
+        new(&operada, positions.lenX, positions.lenY);
+
+        recupera_matriz_operacao(positions.lenX, positions.lenY, &operada);
+        resultado = subtrai_matriz(&positions, &operada);
+
+        system("cls");
+
+        printf("RESULTADO:\n\n");
+        imprime_matriz(resultado);
+
+        freePositions(&operada);
+        freePositions(resultado);
+
         system("pause");
         break;
       case 7:
-        printf("Multiplicar");
+        recupera_numero_colunas_multiplicacao(&maxX);
+
+        new(&operada, positions.lenY, positions.lenX);
+        recupera_matriz_operacao(positions.lenY, positions.lenX, &operada);
+
+        resultado = multiplica_matriz(&positions, &operada);
+
+        system("cls");
+
+        printf("RESULTADO:\n\n");
+        imprime_matriz(resultado);
+
+        freePositions(&operada);
+        freePositions(resultado);
+
         system("pause");
         break;
       case 8:
-        printf("Aplicar transposta");
+        resultado = aplica_transposta(&positions);
+        imprime_matriz(resultado);
+        freePositions(resultado);
         system("pause");
         break;
       case 0:
         exit(0);
     }
-
-
-
-//case 2:
-//  //Mostrar matriz
-//  break;
-//case 3:
-//  //Mostrar diagonal principal
-//  break;
-//case 4:
-//  //Buscar item
-//  break;
-//case 5:
-//  //Somar
-//  break;
-//case 6:
-//  //Subtrair
-//  break;
-//case 7:
-//  //Multiplicar
-//  break;
-//case 8:
-//  //Aplicar transposta
-//  break;
-
   }
 }
 
@@ -502,20 +556,140 @@ void freePositions(Positions *positions) {
 /* 2.0_impl
 /*========================================================================*/
 // 2.1_impl
-int soma_matriz(Positions *matriz1, Positions *matriz2) {
+Positions* soma_matriz(Positions *matriz1, Positions *matriz2) {
+  Positions *result = (Positions*) malloc(sizeof(Positions));
+  new(result, matriz1->lenX, matriz1->lenY);
 
+  if(matriz1->lenX != matriz2->lenX && matriz1->lenY != matriz2->lenY)
+    return result;
+
+  Value value1, value2, valueSoma;
+  Node *node1 = matriz1->first;
+  Node *node2 = matriz2->first;
+
+  int x, y;
+  for (y = 0; y < matriz1->lenY; y++)
+    for (x = 0; x < matriz1->lenX; x++) {
+      value1 = node1 != NULL && node1->item.pos.x == x && node1->item.pos.y == y ? node1->item.value : 0;
+      value2 = node2 != NULL && node2->item.pos.x == x && node2->item.pos.y == y ? node2->item.value : 0;
+
+      valueSoma = value1 + value2;
+      if (valueSoma != 0)
+        add(result, newNode(valueSoma, x, y));
+
+      if (value1 != 0)
+        node1 = node1->next;
+      if (value2 != 0)
+        node2 = node2->next;
+    }
+
+  return result;
 }
+
 // 2.2_impl
-int subtrai_matriz(Positions *matriz1, Positions *matriz2) {
+Positions* subtrai_matriz(Positions *matriz1, Positions *matriz2) {
+  Positions *result = (Positions*) malloc(sizeof(Positions));
+  new(result, matriz1->lenX, matriz1->lenY);
 
+  if(matriz1->lenX != matriz2->lenX && matriz1->lenY != matriz2->lenY)
+    return result;
+
+  Value value1, value2, valueSub;
+  Node *node1 = matriz1->first;
+  Node *node2 = matriz2->first;
+
+  int x, y;
+  for (y = 0; y < matriz1->lenY; y++)
+    for (x = 0; x < matriz1->lenX; x++) {
+      value1 = node1 != NULL && node1->item.pos.x == x && node1->item.pos.y == y ? node1->item.value : 0;
+      value2 = node2 != NULL && node2->item.pos.x == x && node2->item.pos.y == y ? node2->item.value : 0;
+
+      valueSub = value1 - value2;
+      if (valueSub != 0)
+        add(result, newNode(valueSub, x, y));
+
+      if (value1 != 0)
+        node1 = node1->next;
+      if (value2 != 0)
+        node2 = node2->next;
+    }
+
+  return result;
 }
+
+Node* firstLin(Positions *positions, int y) {
+  Node *node = positions->first;
+  while (node != NULL) {
+    if (node->item.pos.y == y)
+      return node;
+    node = node->next;
+  }
+  return NULL;
+}
+
 // 2.3_impl
-int multiplica_matriz(Positions *matriz1, Positions *matriz2) {
+Positions* multiplica_matriz(Positions *matriz1, Positions *matriz2) {
+  Positions *result = (Positions*) malloc(sizeof(Positions));
+  new(result, matriz1->lenY, matriz2->lenX);
 
+  Positions *matriz2T = aplica_transposta(matriz2);
+
+  Node *node1;
+  Node *node2;
+
+  Value value1, value2, totalPos;
+
+  int lin1, y, x;
+  // Varre todas as linhas da matriz 1
+  for (lin1 = 0; lin1 < matriz1->lenY; lin1++) {
+    
+    // Para cada linha, varre todas as linhas da transposta da matriz 2,
+    // que por sua vez, correspondem às colunas da matriz 2.
+    for (y = 0; y < matriz2T->lenY; y++) {
+      
+      // Posiciona os nós no inicio de suas respectivas linhas.
+      // No caso de nó 1, posiciona no inicio da linha da matriz 1 (lin1)
+      node1 = firstLin(matriz1, lin1);
+      // No caso do nó 2, posiciona no inicio da "coluna", que no caso da
+      // tranposta é linha.
+      node2 = firstLin(matriz2T, y);
+      
+      // Zera o contador da posição.
+      totalPos = 0;
+
+      for (x = 0; x < matriz2T->lenX; x++) {
+        value1 = node1 != NULL && node1->item.pos.x == x && node1->item.pos.y == lin1 ? node1->item.value : 0;
+        value2 = node2 != NULL && node2->item.pos.x == x && node2->item.pos.y == y ? node2->item.value : 0;
+        
+        totalPos += value1 * value2;
+        
+        if (value1 != 0)
+          node1 = node1->next;
+        if (value2 != 0)
+          node2 = node2->next;
+      }
+      add(result, newNode(totalPos, y, lin1));
+    }
+  }
+  
+  freePositions(matriz2T);
+  
+  return result;
 }
-// 2.4_impl
-int aplica_transposta(Positions *matriz) {
 
+// 2.4_impl
+Positions* aplica_transposta(Positions *matriz) {
+  Positions *result = (Positions*) malloc(sizeof(Positions));
+  new(result, 0, 0);  
+  
+  Node *nodeAux = matriz->first;
+  
+  while (nodeAux != NULL) {
+    add(result, newNode(nodeAux->item.value, nodeAux->item.pos.y, nodeAux->item.pos.x));
+    nodeAux = nodeAux->next;
+  }
+  
+  return result;
 }
 // 2.5_impl
 int imprime_matriz(Positions *matriz) {
@@ -548,18 +722,16 @@ int imprime_diagonal_principal(Positions *matriz) {
       if (x == y && nodeAux != NULL && nodeAux->item.pos.x == x && nodeAux->item.pos.y == y) {
         printf(PRINTER_ITEM, nodeAux->item.value);
         printf(" ");
-        nodeAux = nodeAux->next;
       }
       else {
-        printf(PRINTER_ITEM, 0);
+        printf("0");
         printf(" ");
       }
+
+      if (nodeAux != NULL && nodeAux->item.pos.x == x && nodeAux->item.pos.y == y)
+        nodeAux = nodeAux->next;
     }
     printf("\n");
   }
   printf("\n");
-}
-// 2.7_impl
-int imprime_diagonal_secundaria(Positions *matriz) {
-
 }
