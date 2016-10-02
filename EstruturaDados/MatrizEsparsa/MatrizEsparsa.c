@@ -1,5 +1,6 @@
 #include<stdio.h>
 #include<string.h>
+#include<stdlib.h>
 #include <locale.h>
 
 /**
@@ -170,8 +171,8 @@ void recupera_node_usuario(int *x, int *y, Value *value) {
     printf("Confirma a adição?\n");
     printf("1 - Sim, 2 - Não\n");
 
-    *x--;
-    *y--;
+    *x = *x - 1;
+    *y = *y - 1;
 
     opcao = op(1, 2, NULL);
   }
@@ -304,6 +305,8 @@ void find(Positions *positions) {
 }
 
 void main() {
+  printf("v1\n");
+  system("pause");
   permite_acentuacao();
 
   Positions positions;
@@ -369,6 +372,31 @@ void new(Positions *positions, int x, int y) {
   positions->lenX = x;
   positions->lenY = y;
 }
+
+void adiciona_depois(Positions *positions, Node *nodeBase, Node *nodeAdd) {
+  if (positions->last == nodeBase)
+    positions->last = nodeAdd;
+
+  if (nodeBase->next != NULL)
+    nodeBase->next->before = nodeAdd;
+
+  nodeAdd->next = nodeBase->next;
+  nodeBase->next = nodeAdd;
+  nodeAdd->before = nodeBase;
+}
+
+void adiciona_antes(Positions *positions, Node *nodeBase, Node *nodeAdd) {
+  if (positions->first == nodeBase)
+    positions->first = nodeAdd;
+
+  if (nodeBase->before != NULL)
+    nodeBase->before->next = nodeAdd;
+
+  nodeAdd->before = nodeBase->before;
+  nodeBase->before = nodeAdd;
+  nodeAdd->next = nodeBase;
+}
+
 // 1.3_impl
 int add(Positions *positions, Node *node) {
   //Se não tiver um primeiro registro, adiciona como primeiro.
@@ -379,67 +407,64 @@ int add(Positions *positions, Node *node) {
   //Se já existe um registro adicionado, encontra a posição para adicionar.
   else {
     Node *nodeAux = positions->first;
+
     while (nodeAux != NULL && nodeAux->item.pos.y < node->item.pos.y)
-      nodeAux = node->next;
+      nodeAux = nodeAux->next;
 
     // Se o nó auxiliar estiver null, significa que a posição Y do nó que está sendo
     // é a maior entre todos os nós que já existem. Por isso, adiciona no final.
-    if (nodeAux == NULL) {
-      node->before = positions->last;
-      positions->last->next = node;
-      positions->last = node;
-      printf("Adicionei na ultima posicao por causa do y");
-    }
+    if (nodeAux == NULL)
+      adiciona_depois(positions, positions->last, node);
     // Senão, significa que o nodeAux está apontando para o primeiro item com Y maior
     // ou igual ao Y do item que está sendo adicionado.
     else
       // Se forem iguais, precisa adicionar em relação à posição X
       if (nodeAux->item.pos.y == node->item.pos.y) {
-        while (nodeAux != NULL && nodeAux->item.pos.x < node->item.pos.x)
-          nodeAux = node->next;
 
-        if (nodeAux == NULL) {
-          node->before = positions->last;
-          positions->last->next = node;
-          positions->last = node;
-          printf("Encontrei um cara e adicionei depois por causa de X");
-        }
-        else
-          // Se x e y forem igual, significa que será dado um replace.
-          if (nodeAux->item.pos.x == node->item.pos.x) {
-            nodeAux->before->next = node;
-            nodeAux->next->before = node;
-            node->before = nodeAux->before;
-            node->next = nodeAux->next;
-            printf("Encontrei um cara na mesma posicao");
-          }
-          // Senão simplesmente adiciona.
+        if (nodeAux->item.pos.x > node->item.pos.x)
+          adiciona_antes(positions, nodeAux, node);
+        else {
+          while (nodeAux != NULL && nodeAux->item.pos.x < node->item.pos.x && nodeAux->item.pos.y == node->item.pos.y)
+            nodeAux = nodeAux->next;
+
+          if (nodeAux == NULL)
+            adiciona_depois(positions, positions->last, node);
           else {
-            node->before = nodeAux;
-            node->next = nodeAux->next;
-            node->next->before = node;
-            nodeAux->next = node;
-            printf("Encontrei um cara na mesma posicao");
+            if (nodeAux->item.pos.y > node->item.pos.y)
+              nodeAux = nodeAux->before;
+
+            if (nodeAux->item.pos.x > node->item.pos.x)
+              adiciona_antes(positions, nodeAux, node);
+
+            else
+              if (nodeAux->item.pos.x == node->item.pos.x) {
+                nodeAux->item.value = node->item.value;
+                //Limpa o node da memória porque ele não foi adicionado na lista.
+                free(node);
+                //Aponta o node para nodeAux porque ele virou o 'adicionado'
+                node = nodeAux;
+              }
+              else
+                adiciona_depois(positions, nodeAux, node);
           }
+        }
       }
-      else {
-        node->next = nodeAux;
-        nodeAux->before->next = node;
-        nodeAux->before = node;
-      }
+      else
+        adiciona_antes(positions, nodeAux, node);
   }
 
   //Altera o máximo de x se precisar
-  if (node->item.pos.x >= positions->lenX)
-     positions->lenX = node->item.pos.x + 1;
+  if (node->item.pos.x + 1 > positions->lenX)
+    positions->lenX = node->item.pos.x + 1;
 
   //Altera o máximo de y se precisar
-  if (node->item.pos.y >= positions->lenY)
-     positions->lenY = node->item.pos.y + 1;
+  if (node->item.pos.y + 1 > positions->lenY)
+    positions->lenY = node->item.pos.y + 1;
 
   positions->size++;
   return 1;
 }
+
 // 1.4_impl
 Item* findByPos(Positions *positions, int x, int y) {
   int px, py;
