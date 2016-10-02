@@ -8,15 +8,15 @@
  * A princípio está declarado como inteiro, entretanto, se for preciso alterá-lo,
  * a mudança será feita somente aqui.
  */
-typedef int Value;
+typedef float Value;
 
 /**
  * Constante estática utilizada para guardar a string de entrada de dados do valor.
  * Caso seja necessário alterar o tipo de dado de Value, só é preciso alterar seu
  * leitor aqui.
  */
-static const char SCANNER_ITEM[] = "%d";
-static const char PRINTER_ITEM[] = "%d";
+static const char SCANNER_ITEM[] = "%f";
+static const char PRINTER_ITEM[] = "%.2f";
 
 /**
  * Definição de um tipo de dado que representa uma posição XY dentro de
@@ -85,14 +85,6 @@ Item* findByPos(Positions *positions, int x, int y);
 Positions* findByValue(Positions *positions, Value value);
 // 1.6_dec - Função que libera a memória alocada para a lista;
 void freePositions(Positions *positions);
-// 1.7_dec - Função que valida se o arquivo tem um formato adequado para a importação.
-int isValid(Positions *positions, FILE *file, char **ret);
-// 1.8_dec - Função que lê os dados da matriz e insere na lista a partir de um arquivo.
-//           Utiliza a função parse passando um leitor de arquivo.
-void parseFromFile(Positions *positions, FILE *file);
-// 1.9_dec - Função que lê os dados da matriz e insere na lista a partir da entrada do usuário.
-//           Utiliza a função parse passando um leitor STDIN.
-void parseFromStdin(Positions *positions);
 /*========================================================================*/
 /* 2.0_dec - Funções referentes à manipulação da matriz
 /*========================================================================*/
@@ -130,14 +122,6 @@ int op(int min, int max, char mensagem[]) {
 
 int permite_acentuacao() {
   setlocale(LC_ALL, "");
-}
-
-char* copyformat(char **str, const char *format, int arg1, int arg2, int arg3) {
-  // Melhorar essa função para alocar um tamanho dinâmico conforme o format
-  // e passar um número ilimitado e de tipos diferentes assim como faz o
-  // printf() e o sprintf().
-  *str = (char *) malloc(128 * sizeof(char));
-  sprintf(*str, format, arg1, arg2, arg3);
 }
 
 /*========================================================================*/
@@ -179,73 +163,22 @@ void recupera_node_usuario(int *x, int *y, Value *value) {
   while (opcao == 2);
 }
 
-int recupera_tipo_load() {
-  int opDimensoes;
-
-  printf("Escolha uma maneira de inicializar a matriz:\n");
-  printf("1. Arquivo de texto.\n");
-  printf("2. Entrada manual.\n");
-
-  return op(1, 2, NULL);
-}
-
-void imprime_informacoes_load_arquivo() {
-  printf("O arquivo de importação precisa estar com o nome \"matriz.txt\" no pasta batch criada junto a esse executável.\n");
-}
-
-FILE* recupera_arquivo_load_valido(Positions *positions) {
-  FILE *file;
-  int valido;
-  int tentativas = 0;
-
-  // Ponteiro que será passado por referência para receber a mensagem de
-  // validação.
-  char *mensagem;
-
-  //Cria o diretório batch.
-  mkdir("batch");
-
-  // Enquanto o arquivo não for válido fica no loop.
-  while (1) {
-    tentativas++;
-    // Limpa a tela
-    system("cls");
-    printf("Número de validações: %d\n", tentativas);
-    printf("------------------------------------------------------\n");
-    // Abre o arquivo matriz.txt
-    file = fopen("batch/matriz.txt", "r");
-    // Posiciona o cursor no início do arquivo.
-    // para que possa ser validado mais de uma vez
-    fseek(file, 0, SEEK_SET);
-    // Realiza a validação.
-    valido = isValid(positions, file, &mensagem);
-    //Se não for válido, mostra a mensagem retornada e continua no loop.
-    if (!valido) {
-      printf("%s", mensagem);
-      printf("Altere o arquivo e tente novamente.\n\n");
-      system("pause");
-    }
-    else
-      break;
-  }
-
-  //Posiciona o cursor no ínicio do arquivo para que ele seja entregue intacto.
-  fseek(file, 0, SEEK_SET);
-  return file;
-}
-
 void imprime_menu_principal() {
   printf("Menu:\n");
   printf("1. Adicionar\n");
-  printf("2. Remover\n");
-  printf("3. Mostrar matriz\n");
+  printf("2. Mostrar matriz\n");
+  printf("3. Mostrar diagonal principal\n");
   printf("4. Buscar item\n");
+  printf("5. Somar\n");
+  printf("6. Subtrair\n");
+  printf("7. Multiplicar\n");
+  printf("8. Aplicar transposta\n");
   printf("0. Sair\n");
 }
 
 void find(Positions *positions) {
   int opBusca;
-  int value;
+  Value value;
   int r, i;
   int x;
   int y;
@@ -281,19 +214,24 @@ void find(Positions *positions) {
         printf("Digite o valor: ");
         scanf(SCANNER_ITEM, &value);
         fflush(stdin);
+        printf("\n");
 
         encontrados = findByValue(positions, value);
 
         if (encontrados->size > 0) {
           atual = encontrados->first;
           while (atual != NULL) {
-            printf("%d / %d: ", atual->item.pos.y, atual->item.pos.x);
-            printf(PRINTER_ITEM, atual->item.value);
-            printf("\n\n");
+            printf("Encontrado em linha %d coluna %d.", atual->item.pos.y + 1, atual->item.pos.x + 1);
+            printf("\n");
+            atual = atual->next;
           }
+          printf("\n");
         }
         else
           printf("Nenhum item encontrado com esse valor.\n\n");
+
+        freePositions(encontrados);
+
         break;
       case 0:
         goto saida_loop;
@@ -305,8 +243,6 @@ void find(Positions *positions) {
 }
 
 void main() {
-  printf("v1\n");
-  system("pause");
   permite_acentuacao();
 
   Positions positions;
@@ -325,7 +261,7 @@ void main() {
     imprime_menu_principal();
 
     //Pergunta a opção.
-    int opMenu = op(0, 4, NULL);
+    int opMenu = op(0, 8, NULL);
 
     system("cls");
 
@@ -336,18 +272,60 @@ void main() {
         add(&positions, newNode(value, x, y));
         break;
       case 2:
-        find(&positions);
+        imprime_matriz(&positions);
+        system("pause");
         break;
       case 3:
-        imprime_matriz(&positions);
+        imprime_diagonal_principal(&positions);
         system("pause");
         break;
       case 4:
         find(&positions);
         break;
+      case 5:
+        printf("Somar");
+        system("pause");
+        break;
+      case 6:
+        printf("Subtrair");
+        system("pause");
+        break;
+      case 7:
+        printf("Multiplicar");
+        system("pause");
+        break;
+      case 8:
+        printf("Aplicar transposta");
+        system("pause");
+        break;
       case 0:
         exit(0);
     }
+
+
+
+//case 2:
+//  //Mostrar matriz
+//  break;
+//case 3:
+//  //Mostrar diagonal principal
+//  break;
+//case 4:
+//  //Buscar item
+//  break;
+//case 5:
+//  //Somar
+//  break;
+//case 6:
+//  //Subtrair
+//  break;
+//case 7:
+//  //Multiplicar
+//  break;
+//case 8:
+//  //Aplicar transposta
+//  break;
+
   }
 }
 
@@ -421,8 +399,9 @@ int add(Positions *positions, Node *node) {
       // Se forem iguais, precisa adicionar em relação à posição X
       if (nodeAux->item.pos.y == node->item.pos.y) {
 
-        if (nodeAux->item.pos.x > node->item.pos.x)
+        if (nodeAux->item.pos.x > node->item.pos.x) {
           adiciona_antes(positions, nodeAux, node);
+        }
         else {
           while (nodeAux != NULL && nodeAux->item.pos.x < node->item.pos.x && nodeAux->item.pos.y == node->item.pos.y)
             nodeAux = nodeAux->next;
@@ -496,126 +475,27 @@ Positions* findByValue(Positions *positions, Value value) {
   Positions *result = (Positions*) malloc(sizeof(Positions));
   new(result, 0, 0);
 
-  // TODO Ir preenchendo a lista com o que encontrou.
+  Node *aux = positions->first;
+  while (aux != NULL) {
+
+    if (aux->item.value == value)
+      add(result, newNode(aux->item.value, aux->item.pos.x, aux->item.pos.y));
+
+    aux = aux->next;
+  }
 
   return result;
 }
 // 1.6_impl
 void freePositions(Positions *positions) {
-
-}
-
-// 1.7_impl
-int isValid(Positions *positions, FILE *file, char **ret) {
-  //Strings constantes para erros de validação
-  const char *err_col = "Arquivo inválido: Erro linha %d. Colunas encontradas %d. Esperado %d\n";
-  const char *err_lin = "Arquivo inválido: Linhas encontradas %d. Esperado %d\n";
-
-  //Variáveis assistentes.
-  char ch;
-  int nlin = 1, ncol = 1;
-  int wasCh = 0;
-
-  // Se o arquivo não existir, retorna que não é válido
-  if (file == NULL) {
-    *ret = "Arquivo não encontrado. \n Crie um arquivo chamado matriz.txt na pasta batch.";
-    return 0;
+  Node *node = positions->first;
+  Node *next = NULL;
+  while (node != NULL) {
+    next = node->next;
+    free(node);
+    node = next;
   }
-
-  while ((ch = fgetc(file)) != EOF) {
-    // Se encontrar um espaço e se o ultimo caractere não fosse de marcação.
-    // incrementa o número de colunas.
-    if (wasCh && ch == ' ')
-      ncol++;
-
-    // Senão, se encontrar um quebra de linha.
-    else if (ch == '\n') {
-      // Verifica se o número de colunas contadas até agora é diferente do número
-      // de colunas esperadas. Se for, informa que o arquivo está inválido.
-      if (positions->lenX != ncol) {
-        copyformat(ret, err_col, nlin, ncol, positions->lenX);
-        return 0;
-      }
-      // Incrementa o número de linhas.
-      nlin += 1;
-      // Volta para 1 o número de colunas.
-      ncol = 1;
-    }
-    // Indica se esse último caractere era ou não um caractere especial.
-    wasCh = (ch != '\n' && ch != ' ');
-  }
-
-  //Valida o número de linhas do arquivo.
-  if (positions->lenY != nlin) {
-    copyformat(ret, err_lin, nlin, positions->lenY, 0);
-    return 0;
-  }
-
-  //Valida o número de colunas para a última linha.
-  if (positions->lenX != ncol) {
-    copyformat(ret, err_col, nlin, ncol, positions->lenX);
-    return 0;
-  }
-  return 1;
-}
-
-// Ponteiro global para arquivo utilizado pelo fileReader.
-FILE *fileTemp;
-
-void fileReader(Value *value, int x, int y) {
-  int i = 0;
-  char ch;
-  char numb[16];
-
-  //Pega o número até o espaço.
-  while ((ch = fgetc(fileTemp)) != ' ' && ch != '\n' && ch != EOF)
-    numb[i++] = ch;
-
-  //Coloca em value o que foi recuperado.
-  *value = atoi(numb);
-}
-
-// 1.8_impl
-void parseFromFile(Positions *positions, FILE *file) {
-  fileTemp = file;
-  parse(positions, fileReader);
-  fclose(file);
-}
-
-void stdinReader(Value *value, int x, int y) {
-  printf("%d/%d: ", y + 1, x + 1);
-  scanf(SCANNER_ITEM, value);
-  fflush(stdin);
-}
-
-// 1.9_impl
-void parseFromStdin(Positions *positions) {
-  parse(positions, stdinReader);
-}
-
-void parse(Positions *positions, Reader reader) {
-  int x, y;
-  Value valueAux;
-  Node *node;
-
-  for (y = 0; y < positions->lenY; y++)
-    for (x = 0; x < positions->lenX; x++) {
-      // Coloca na variavel valueAux o conteúdo da posição dos valores x y.
-      (*reader)(&valueAux, x, y);
-      // Se o valor retornado for diferente de 0, então adiciona ele na lista.
-      if (valueAux != 0) {
-        // Aloca um nó para adicionar na lista.
-        node = newNode(valueAux, x, y);
-        // Adiciona o nó na lista.
-        add(positions, node);
-      }
-      printf("Valor ");
-      printf(PRINTER_ITEM, valueAux);
-      printf(" atribuido à posição %d/%d", y + 1, x + 1);
-      printf("\n");
-    }
-  printf("\nMatriz carregada com sucesso!\n\n");
-  system("pause");
+  free(positions);
 }
 
 /*========================================================================*/
@@ -645,11 +525,14 @@ int imprime_matriz(Positions *matriz) {
   for (y = 0; y < matriz->lenY; y++) {
     for (x = 0; x < matriz->lenX; x++) {
       if (nodeAux != NULL && nodeAux->item.pos.x == x && nodeAux->item.pos.y == y) {
-        printf("%d ", nodeAux->item.value);
+        printf(PRINTER_ITEM, nodeAux->item.value);
+        printf(" ");
         nodeAux = nodeAux->next;
       }
-      else
-        printf("%d ", 0);
+      else {
+        printf(PRINTER_ITEM, 0);
+        printf(" ");
+      }
     }
     printf("\n");
   }
@@ -657,7 +540,24 @@ int imprime_matriz(Positions *matriz) {
 }
 // 2.6_impl
 int imprime_diagonal_principal(Positions *matriz) {
+  int x, y;
+  Node *nodeAux = matriz->first;
 
+  for (y = 0; y < matriz->lenY; y++) {
+    for (x = 0; x < matriz->lenX; x++) {
+      if (x == y && nodeAux != NULL && nodeAux->item.pos.x == x && nodeAux->item.pos.y == y) {
+        printf(PRINTER_ITEM, nodeAux->item.value);
+        printf(" ");
+        nodeAux = nodeAux->next;
+      }
+      else {
+        printf(PRINTER_ITEM, 0);
+        printf(" ");
+      }
+    }
+    printf("\n");
+  }
+  printf("\n");
 }
 // 2.7_impl
 int imprime_diagonal_secundaria(Positions *matriz) {
