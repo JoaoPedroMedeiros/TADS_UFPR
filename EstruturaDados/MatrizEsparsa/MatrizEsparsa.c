@@ -64,7 +64,7 @@ typedef struct positions {
 /*========================================================================*/
 // 1.1_dec - Função que faz a alocação de memória para cada nodo criado na lista;
 Node* newNode(Value value, int x, int y);
-// 1.2_dec - Função que faz a alocação de memória para cada nodo criado na lista;
+// 1.2_dec - Função que faz a alocação de memória para uma lista.
 void new(Positions *positions, int x, int y);
 // 1.3_dec - Função que insere na lista um nodo alocado;
 int add(Positions *positions, Node *node);
@@ -160,6 +160,7 @@ void imprime_menu_principal() {
   printf("6. Subtrair\n");
   printf("7. Multiplicar\n");
   printf("8. Aplicar transposta\n");
+  printf("9. Limpar matriz\n");
   printf("0. Sair\n");
 }
 
@@ -279,6 +280,14 @@ void recupera_numero_colunas_multiplicacao(int *maxX) {
   while (*maxX < 1);
 }
 
+void limpar(Positions *positions) {
+  freePositions(positions);
+  new(positions, 0, 0);
+}
+
+/*========================================================================*/
+/* Main                                
+/*========================================================================*/
 void main() {
   permite_acentuacao();
 
@@ -300,10 +309,10 @@ void main() {
     imprime_menu_principal();
 
     //Pergunta a opção.
-    int opMenu = op(0, 8, NULL);
+    int opMenu = op(0, 9, NULL);
 
     system("cls");
-
+ 
     //Verifica qual foi a opção.
     switch (opMenu) {
       case 1:
@@ -356,8 +365,8 @@ void main() {
       case 7:
         recupera_numero_colunas_multiplicacao(&maxX);
 
-        new(&operada, positions.lenY, positions.lenX);
-        recupera_matriz_operacao(positions.lenY, positions.lenX, &operada);
+        new(&operada, maxX, positions.lenX);
+        recupera_matriz_operacao(maxX, positions.lenX, &operada);
 
         resultado = multiplica_matriz(&positions, &operada);
 
@@ -375,6 +384,11 @@ void main() {
         resultado = aplica_transposta(&positions);
         imprime_matriz(resultado);
         freePositions(resultado);
+        system("pause");
+        break;
+      case 9:
+        limpar(&positions);
+        printf("Matriz zerada com sucesso!\n\n");
         system("pause");
         break;
       case 0:
@@ -453,22 +467,31 @@ int add(Positions *positions, Node *node) {
       // Se forem iguais, precisa adicionar em relação à posição X
       if (nodeAux->item.pos.y == node->item.pos.y) {
 
+        // Se o x for maior que o x do nó adicionado, adiciona antes.
         if (nodeAux->item.pos.x > node->item.pos.x) {
           adiciona_antes(positions, nodeAux, node);
         }
+        // Senão, procura até o fim da linha alguém que tenha o x igual ou maior que o x adicionado.
         else {
           while (nodeAux != NULL && nodeAux->item.pos.x < node->item.pos.x && nodeAux->item.pos.y == node->item.pos.y)
             nodeAux = nodeAux->next;
 
+          // Se o nó auxiliar estiver null, significa que estava na ultima linha e não encontrou
+          // ninguém com um x maior, então adiciona depois do último.
           if (nodeAux == NULL)
             adiciona_depois(positions, positions->last, node);
           else {
+            // Se tiver saído da busca por chegar na linha seguinte, retorna para o nó anterior
             if (nodeAux->item.pos.y > node->item.pos.y)
               nodeAux = nodeAux->before;
 
+            // Enfim, se o encontrou um x maior que o x adicionado, adiciona antes.
             if (nodeAux->item.pos.x > node->item.pos.x)
               adiciona_antes(positions, nodeAux, node);
-
+         
+            // Senão, significa que é pra adicionar em uma posição que já existe,
+            // então substitui e aponta o ponteiro passado por parâmetro para o
+            // nó antigo com valor substituído.
             else
               if (nodeAux->item.pos.x == node->item.pos.x) {
                 nodeAux->item.value = node->item.value;
@@ -478,10 +501,13 @@ int add(Positions *positions, Node *node) {
                 node = nodeAux;
               }
               else
+                // Senão significa que não encontrou nenhum maior, então adiciona
+                // depois do último encontrado na linha.
                 adiciona_depois(positions, nodeAux, node);
           }
         }
       }
+      // Se só encontrou um y maior que o y adicionado, adiciona antes.
       else
         adiciona_antes(positions, nodeAux, node);
   }
@@ -529,15 +555,24 @@ Positions* findByValue(Positions *positions, Value value) {
   Positions *result = (Positions*) malloc(sizeof(Positions));
   new(result, 0, 0);
 
+  int x, y;
+
   Node *aux = positions->first;
-  while (aux != NULL) {
-
-    if (aux->item.value == value)
-      add(result, newNode(aux->item.value, aux->item.pos.x, aux->item.pos.y));
-
-    aux = aux->next;
-  }
-
+  if (value != 0)
+    while (aux != NULL) {
+      if (aux->item.value == value)
+        add(result, newNode(value, aux->item.pos.x, aux->item.pos.y));
+    
+      aux = aux->next;
+    }
+  else
+    for (y = 0; y < positions->lenY; y++)
+      for (x = 0; x < positions->lenX; x++)
+        if (aux != NULL && aux->item.pos.x == x && aux->item.pos.y == y)
+          aux = aux->next;  
+        else
+          add(result, newNode(value, x, y));  
+  
   return result;
 }
 // 1.6_impl
@@ -630,33 +665,26 @@ Node* firstLin(Positions *positions, int y) {
 // 2.3_impl
 Positions* multiplica_matriz(Positions *matriz1, Positions *matriz2) {
   Positions *result = (Positions*) malloc(sizeof(Positions));
-  new(result, matriz1->lenY, matriz2->lenX);
+  new(result, matriz2->lenX, matriz1->lenY);
 
   Positions *matriz2T = aplica_transposta(matriz2);
 
-  Node *node1;
-  Node *node2;
+  Node *node1 = matriz1->first;
+  Node *node2 = matriz2->first;
 
   Value value1, value2, totalPos;
 
   int lin1, y, x;
-  // Varre todas as linhas da matriz 1
+  // Percorre o número de linhas da matriz 1
   for (lin1 = 0; lin1 < matriz1->lenY; lin1++) {
     
-    // Para cada linha, varre todas as linhas da transposta da matriz 2,
-    // que por sua vez, correspondem às colunas da matriz 2.
+    // Dentro de cada linha, percorre todos os itens da matriz 2 transposta.
     for (y = 0; y < matriz2T->lenY; y++) {
-      
-      // Posiciona os nós no inicio de suas respectivas linhas.
-      // No caso de nó 1, posiciona no inicio da linha da matriz 1 (lin1)
+    
       node1 = firstLin(matriz1, lin1);
-      // No caso do nó 2, posiciona no inicio da "coluna", que no caso da
-      // tranposta é linha.
       node2 = firstLin(matriz2T, y);
       
-      // Zera o contador da posição.
       totalPos = 0;
-
       for (x = 0; x < matriz2T->lenX; x++) {
         value1 = node1 != NULL && node1->item.pos.x == x && node1->item.pos.y == lin1 ? node1->item.value : 0;
         value2 = node2 != NULL && node2->item.pos.x == x && node2->item.pos.y == y ? node2->item.value : 0;
@@ -717,6 +745,11 @@ int imprime_diagonal_principal(Positions *matriz) {
   int x, y;
   Node *nodeAux = matriz->first;
 
+  if (matriz->lenY != matriz->lenX) {
+    printf("A matriz não é quadrada.\n\n");
+    return;
+  }
+    
   for (y = 0; y < matriz->lenY; y++) {
     for (x = 0; x < matriz->lenX; x++) {
       if (x == y && nodeAux != NULL && nodeAux->item.pos.x == x && nodeAux->item.pos.y == y) {
