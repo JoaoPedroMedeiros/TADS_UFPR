@@ -47,8 +47,8 @@ int jogada_usuario(int lin, int col, char jog) {
     return 2;
   
   else {
-  	velha[lin][col] = jog;
-  	return 0;
+    velha[lin][col] = jog;
+    return 0;
   }
 }
 
@@ -56,15 +56,15 @@ int jogada_computador(char jog, int nivel) {
   int linha, coluna;
   
   switch (nivel) {
-  	case 1:
-  	  recupera_posicao_basico(&linha, &coluna);
-  	  break;
-  	case 2:
-  	  recupera_posicao_intermediario(jog, &linha, &coluna);
-  	  break;
-  	case 3:
-  	  recupera_posicao_avancado(jog, &linha, &coluna);
-  	  break;
+    case 1:
+      recupera_posicao_basico(&linha, &coluna);
+      break;
+    case 2:
+      recupera_posicao_intermediario(jog, &linha, &coluna);
+      break;
+    case 3:
+      recupera_posicao_avancado(jog, &linha, &coluna);
+      break;
   }
   
   velha[linha][coluna] = jog;
@@ -74,7 +74,7 @@ void efetua_jogada_usuario(struct jogador *jog) {
   int linha, coluna, jogada;
   
   do {
-  	printf("%s (%c), digite a linha e a coluna: ", (*jog).nome, (*jog).simbolo);
+    printf("%s (%c), digite a linha e a coluna: ", (*jog).nome, (*jog).simbolo);
     scanf("%d", &linha);
     scanf("%d", &coluna);
     fflush(stdin);
@@ -84,14 +84,14 @@ void efetua_jogada_usuario(struct jogador *jog) {
     if (jogada == 1)
       printf("Posicao invalida.\n");
     else if (jogada == 2)
-	  printf("Posicao ja preenchida.\n");
+      printf("Posicao ja preenchida.\n");
   }
   //Enquanto for 1 ou 2 (inválida)
   while (jogada);
 }
 
 void efetua_jogada_computador(struct jogador *jog) {
-  //Chama a jogada do computador	
+  //Chama a jogada do computador    
   jogada_computador((*jog).simbolo, (*jog).nivel);
   
 }
@@ -100,26 +100,26 @@ int recupera_possibilidade_por_valores(char valores[2], char jog) {
   
   //Se os dois estiverem preenchidos
   if (valores[0] != vazio && valores[1] != vazio)
-	//Se os dois simbolos forem iguais
-	if (valores[0] == valores[1])
-	  
-	  //Se for para ganhar
-	  if (valores[0] == jog)
-	    return 8;
-	  //Se for para defender
-	  else
-	    return 4;
-	
-	//Se tiver preenchido com um de cada
-	else
-	  return 0;
-	  
+    //Se os dois simbolos forem iguais
+    if (valores[0] == valores[1])
+      
+      //Se for para ganhar
+      if (valores[0] == jog)
+        return 8;
+      //Se for para defender
+      else
+        return 4;
+    
+    //Se tiver preenchido com um de cada
+    else
+      return 0;
+      
   //Se algum deles estiver vazio
   else 
     //Se tudo estiver vazio
-	if (valores[0] == vazio && valores[1] == vazio)
+    if (valores[0] == vazio && valores[1] == vazio)
       return 1;
-	//Se tiver preenchido somente com o simbolo do jogador atual
+    //Se tiver preenchido somente com o simbolo do jogador atual
     else if (valores[0] == jog || valores[1] == jog)
       return 2;
     //Se tiver preenchido somente com o simbolo do rival
@@ -133,55 +133,55 @@ void recupera_possibilidades(int possib[3][3], char jog) {
   
   //Zera as possibilidades
   for (i = 0; i < 3; i++)   
-	for (j = 0; j < 3; j++)
-	  possib[i][j] = 0;
+    for (j = 0; j < 3; j++)
+      possib[i][j] = 0;
  
   for (i = 0; i < 3; i++)
     
-	for (j = 0; j < 3; j++)
-	  
-	  if (velha[i][j] == vazio) {
-	  	
-	    //Calcula as possibilidades para linha
-	    indice = 0;
-		for (k = 0; k < 3; k++) {
-	      if (k != j)
-	        valores_linha[indice++] = velha[i][k];
-	    }
-		possib[i][j] += recupera_possibilidade_por_valores(valores_linha, jog);
-		
-		//Calcula as possibilidades para coluna
-		indice = 0;
-		for (k = 0; k < 3; k++) {
-	      if (k != i)
-	        valores_linha[indice++] = velha[k][j];
-	    }
-		possib[i][j] += recupera_possibilidade_por_valores(valores_linha, jog);
-		
-		//Calcula as possibilidades para a diagonal principal (A casa faz parte da diagonal principal se i = j)
-		if (i == j) {
-		  indice = 0;
-		  for (k = 0; k < 3; k++) {
-	     	if (k != i)
-	     	  valores_linha[indice++] = velha[k][k];
-	      }
-		  possib[i][j] += recupera_possibilidade_por_valores(valores_linha, jog);
-		}
-		
-		//Calcula as possibilidades para a diagonal secundária (A casa faz parte da diagonal secundário se i + j = 2)
-		if (i + j == 2) {
-		  indice = 0;
-		  for (k = 0; k < 3; k++) {
-		    if ((k != i) || (2 - k != j))
-		      valores_linha[indice++] = velha[k][2 - k];
-		  }
-		  possib[i][j] += recupera_possibilidade_por_valores(valores_linha, jog);
-		}
-	  }
-	  
-	  //Espaço já preenchido
-	  else
-	    possib[i][j] = 0;
+    for (j = 0; j < 3; j++)
+      
+      if (velha[i][j] == vazio) {
+          
+        //Calcula as possibilidades para linha
+        indice = 0;
+        for (k = 0; k < 3; k++) {
+          if (k != j)
+            valores_linha[indice++] = velha[i][k];
+        }
+        possib[i][j] += recupera_possibilidade_por_valores(valores_linha, jog);
+        
+        //Calcula as possibilidades para coluna
+        indice = 0;
+        for (k = 0; k < 3; k++) {
+          if (k != i)
+            valores_linha[indice++] = velha[k][j];
+        }
+        possib[i][j] += recupera_possibilidade_por_valores(valores_linha, jog);
+        
+        //Calcula as possibilidades para a diagonal principal (A casa faz parte da diagonal principal se i = j)
+        if (i == j) {
+          indice = 0;
+          for (k = 0; k < 3; k++) {
+             if (k != i)
+               valores_linha[indice++] = velha[k][k];
+          }
+          possib[i][j] += recupera_possibilidade_por_valores(valores_linha, jog);
+        }
+        
+        //Calcula as possibilidades para a diagonal secundária (A casa faz parte da diagonal secundário se i + j = 2)
+        if (i + j == 2) {
+          indice = 0;
+          for (k = 0; k < 3; k++) {
+            if ((k != i) || (2 - k != j))
+              valores_linha[indice++] = velha[k][2 - k];
+          }
+          possib[i][j] += recupera_possibilidade_por_valores(valores_linha, jog);
+        }
+      }
+      
+      //Espaço já preenchido
+      else
+        possib[i][j] = 0;
 }
 
 void recupera_posicao_basico(int *lin, int *col) {
@@ -196,12 +196,12 @@ void recupera_melhor_possibilidade(int possib[3][3], int *lin, int *col) {
   int i, j, maior;
   *lin = -1;
   for (i = 0; i < 3; i++)   
-	for (j = 0; j < 3; j++)
-	  if ((*lin == - 1 && velha[i][j] == vazio) || maior < possib[i][j]) {
-	  	maior = possib[i][j];
-	    *lin = i;
-	    *col = j;
-	  }
+    for (j = 0; j < 3; j++)
+      if ((*lin == - 1 && velha[i][j] == vazio) || maior < possib[i][j]) {
+          maior = possib[i][j];
+        *lin = i;
+        *col = j;
+      }
 }
 
 void recupera_posicao_intermediario(char jog, int *lin, int *col) {
@@ -213,12 +213,12 @@ void recupera_posicao_intermediario(char jog, int *lin, int *col) {
   for (i = 0; i < 3; i++)   
     for (j = 0; j < 3; j++)
       if (velha[i][j] != vazio)
-      	if (eh_inicio == 1) { 
-		  eh_inicio++;
-		  goto verifica_inicio;
-		}
-		else
-		  eh_inicio = 1;
+          if (eh_inicio == 1) { 
+          eh_inicio++;
+          goto verifica_inicio;
+        }
+        else
+          eh_inicio = 1;
   
   verifica_inicio: eh_inicio = eh_inicio < 2;
   
@@ -371,11 +371,11 @@ void recupera_jogadores(char url[], struct jogador *jog1, struct jogador *jog2) 
   if (file != NULL) {
   
     if (tamanho_arq(file) < 13) {
-	  printf("Desculpe, o arquivo de nomes está vazio. Abra o jogo novamente.\n\n");
-	  fclose(file);
-	  remove(arq_nomes);
-	  exit(0);
-	}
+      printf("Desculpe, o arquivo de nomes está vazio. Abra o jogo novamente.\n\n");
+      fclose(file);
+      remove(arq_nomes);
+      exit(0);
+    }
   
     fscanf(file, "%s ; %c ; %s ; %c\n", &nome1, &simb1, &nome2, &simb2);
   
@@ -398,12 +398,12 @@ void jogadores_campeonato(struct jogador *jog1, struct jogador *jog2) {
     preenche_usuario(jog1, nome1);
     preenche_usuario(jog2, nome2);
     
-	escolha_simb(&(*jog1).simbolo, &(*jog2).simbolo);
-	
-	if (!(grava_jogadores(arq_nomes, *jog1, *jog2))) {
-	  printf("Desculpe, houve um erro ao gravar o nome dos jogadores :/");
-	  exit(0);
-	}
+    escolha_simb(&(*jog1).simbolo, &(*jog2).simbolo);
+    
+    if (!(grava_jogadores(arq_nomes, *jog1, *jog2))) {
+      printf("Desculpe, houve um erro ao gravar o nome dos jogadores :/");
+      exit(0);
+    }
   }
   else
     recupera_jogadores(arq_nomes, jog1, jog2);
@@ -417,8 +417,8 @@ void preenche_info_campeonato(int *vitoriasX, int *vitoriasO, int *nrPartidas) {
   *nrPartidas = recupera_partidas(arq_velha, &partidas);
   
   for (i = 0; i < *nrPartidas; i++) {
-  	*vitoriasX += partidas[i].resultado == 'X' ? 1 : 0; 
-  	*vitoriasO += partidas[i].resultado == 'O' ? 1 : 0;
+      *vitoriasX += partidas[i].resultado == 'X' ? 1 : 0; 
+      *vitoriasO += partidas[i].resultado == 'O' ? 1 : 0;
   }
 }
 
@@ -435,8 +435,8 @@ void relatorio() {
   recupera_jogadores(arq_nomes, &jog1, &jog2);
   
   for (i = 0; i < nrPartidas; i++) {
-  	vitoriasX += partidas[i].resultado == 'X' ? 1 : 0; 
-  	vitoriasO += partidas[i].resultado == 'O' ? 1 : 0;
+      vitoriasX += partidas[i].resultado == 'X' ? 1 : 0; 
+      vitoriasO += partidas[i].resultado == 'O' ? 1 : 0;
   }
   
   system("cls");
@@ -449,15 +449,15 @@ void relatorio() {
   printf("|=====================================|\r\n"); 
  
   for (i = 0; i < nrPartidas; i++) {
-	printf("Partida numero %d ", partidas[i].partida);
-	if (partidas[i].resultado == 'V')
-	  printf("deu velha.\n");
-	else if (partidas[i].resultado == 'X')
-	  printf("%s ganhou.\n", jog1.simbolo == 'X' ? jog1.nome : jog2.nome);
-	else if (partidas[i].resultado == 'O')
-	  printf("%s ganhou.\n", jog1.simbolo == 'O' ? jog1.nome : jog2.nome);
-  	desenha_painel(partidas[i].velha);
-  	printf("\n");
+    printf("Partida numero %d ", partidas[i].partida);
+    if (partidas[i].resultado == 'V')
+      printf("deu velha.\n");
+    else if (partidas[i].resultado == 'X')
+      printf("%s ganhou.\n", jog1.simbolo == 'X' ? jog1.nome : jog2.nome);
+    else if (partidas[i].resultado == 'O')
+      printf("%s ganhou.\n", jog1.simbolo == 'O' ? jog1.nome : jog2.nome);
+    desenha_painel(partidas[i].velha);
+    printf("\n");
   }
   
   system("pause");
@@ -539,10 +539,10 @@ int main() {
   char vencedor;
   
   do {
-  	inicio:
-  	
-  	system("cls");
-  	
+      inicio:
+      
+      system("cls");
+      
     //Recupera a opção de jogo
     //  1 - Player vs Player
     //  2 - Player vs Computador
@@ -570,19 +570,19 @@ int main() {
         printf("Inicie um campeonato para acessar essa opcao.\n\n");
         system("pause");
       }
-      else	
-	    relatorio();
-	  goto inicio;
-	}
-	else if (op == 5) {
-	  if (!arquivo_existe(arq_nomes) || !arquivo_existe(arq_velha)) {
+      else    
+        relatorio();
+      goto inicio;
+    }
+    else if (op == 5) {
+      if (!arquivo_existe(arq_nomes) || !arquivo_existe(arq_velha)) {
         printf("Inicie um campeonato para acessar essa opcao.\n\n");
         system("pause");
       }
-      else	
-	    pesquisar();
-	  goto inicio;
-	}
+      else    
+        pesquisar();
+      goto inicio;
+    }
   
     vitoriasX = vitoriasO = nrPartidas = 0;
   
@@ -610,13 +610,13 @@ int main() {
       printf(" 0 - Sair.                       \n");
       
       do {
-      	printf("Opcao: ");
-	    scanf("%d", &control);
-	    fflush(stdin);
-	  }
-	  while (control < 0 || control > 2);
-	  
-	  system("cls");
+          printf("Opcao: ");
+        scanf("%d", &control);
+        fflush(stdin);
+      }
+      while (control < 0 || control > 2);
+      
+      system("cls");
     }
     //Enquanto quiser jogar com as mesmas opções
     while (control == 1);
@@ -632,18 +632,18 @@ int verifica_ganhador(char jog) {
   int diag_menor_valida = 1;
   int i, j;
   for (i = 0; i < 3; i++) {
-  	linha_valida = 1;
-  	coluna_valida = 1;
-  	diag_maior_valida = diag_maior_valida && velha[i][i] == jog;
-  	diag_menor_valida = diag_menor_valida && velha[i][2 - i] == jog;
+    linha_valida = 1;
+    coluna_valida = 1;
+    diag_maior_valida = diag_maior_valida && velha[i][i] == jog;
+    diag_menor_valida = diag_menor_valida && velha[i][2 - i] == jog;
     for (j = 0; j < 3; j++) {
-	  linha_valida = linha_valida && velha[i][j] == jog;
-	  coluna_valida = coluna_valida && velha[j][i] == jog;
-	  if (!linha_valida && !coluna_valida)
-	    break;
-	}
-	if (linha_valida || coluna_valida)
-	  return 1;
+      linha_valida = linha_valida && velha[i][j] == jog;
+      coluna_valida = coluna_valida && velha[j][i] == jog;
+      if (!linha_valida && !coluna_valida)
+        break;
+    }
+    if (linha_valida || coluna_valida)
+      return 1;
   }
   return (diag_maior_valida || diag_menor_valida);
 }
@@ -673,11 +673,11 @@ char jogar(int op, struct jogador *jog1, struct jogador *jog2) {
   inicializa_velha();
   
   do {
-  	system("cls");
-  	desenha_placar((*jog1).simbolo == 'X' ? jog1 : jog2, (*jog2).simbolo == 'O' ? jog2 : jog1);
-	desenha_painel(velha);
-  	
-  	//Altera a vez do jogador
+    system("cls");
+    desenha_placar((*jog1).simbolo == 'X' ? jog1 : jog2, (*jog2).simbolo == 'O' ? jog2 : jog1);
+    desenha_painel(velha);
+      
+      //Altera a vez do jogador
     jogAtual = jogAtual == jog1 ? jog2 : jog1;
     
     //Efetua a jogada do jogador
@@ -685,7 +685,7 @@ char jogar(int op, struct jogador *jog1, struct jogador *jog2) {
     
     system("cls");
     desenha_placar((*jog1).simbolo == 'X' ? jog1 : jog2, (*jog2).simbolo == 'O' ? jog2 : jog1);
-	desenha_painel(velha);
+    desenha_painel(velha);
   }
   //Repete o processo enquanto ninguém ganhar e a velha não estiver completa
   while (!verifica_ganhador((*jogAtual).simbolo) && !(completou = velha_completa()));
@@ -711,7 +711,7 @@ int menu() {
   printf(" 5. Pesquisar partida      \n");
    
   do {
-  	printf("Opcao: ");
+    printf("Opcao: ");
     scanf("%d", &op);
     fflush(stdin);
   }
@@ -726,7 +726,7 @@ void escolha_simb(char *simb1, char *simb2) {
   printf("Selecione o simbolo do jogador 1 (X / O)\n");
   
   do {
-  	printf("Opcao: ");
+    printf("Opcao: ");
     scanf("%c", &auxEntrada);
     *simb1 = toupper(auxEntrada);
     fflush(stdin);
@@ -745,7 +745,7 @@ int obtem_nivel() {
   printf(" 3. Avancado.       \n");
    
   do {
-  	printf("Opcao: ");
+    printf("Opcao: ");
     scanf("%d", &nivel);
     fflush(stdin);
   }
@@ -767,16 +767,16 @@ void desenha_painel(char v[3][3]) {
   int i, j;
   printf("|==============|\r\n");
   for (i = 0; i < 5; i++) {
-  	printf("| ");
-	for (j = 0; j < 3; j++) {
-	  if (i % 2 != 0) {
-	    printf("----");
-	    continue;
-  	  }
-	  printf(" ");	
-	  printf("%c", v[i/2][j] != vazio ? v[i/2][j] : ' ');
-	  if (j < 2)
-	    printf(" |");
+    printf("| ");
+    for (j = 0; j < 3; j++) {
+      if (i % 2 != 0) {
+        printf("----");
+        continue;
+      }
+      printf(" ");    
+      printf("%c", v[i/2][j] != vazio ? v[i/2][j] : ' ');
+      if (j < 2)
+        printf(" |");
     }
     printf("\r\n");
   }
