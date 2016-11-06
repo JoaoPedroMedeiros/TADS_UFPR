@@ -3,8 +3,8 @@
 #include<stdlib.h>
 #include<time.h>
 
-#define mx 70
-#define my 70
+#define mx 30
+#define my 30
 
 /**
  * Estrutura para marcar uma posição.
@@ -263,15 +263,16 @@ void aloca_labirinto(Labirinto labirinto) {
  *
  */
 void imprime_labirinto(Labirinto labirinto) {
-  char *desenho;
-  desenho = (char*) malloc(sizeof(char) * (mx + 1) * (my + 2));
+  char *desenho = (char*) malloc(sizeof(char) * (mx + 1) * (my + 2));
   int count = 0;
   int x, y;
   for (y = 0; y <my; y++) {
     for (x = 0; x < mx; x++){
+      //printf("%c", caractere_posicao(&labirinto[x][y]));
       desenho[count++] = caractere_posicao(&labirinto[x][y]);
     }
     desenho[count++] = '\n';
+    //printf("\n");
   }
 
   printf("%s", desenho);
