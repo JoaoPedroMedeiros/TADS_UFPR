@@ -1,0 +1,50 @@
+QUESTÕES
+========================================================================================
+1. Para que serve o feedback?
+2. Cite 3 pontos para o feedback ser um processo útil.
+3. Porque é difícil receber e o  que usamos para nos defender dele?
+4. Gostamos de dar conselhos, e com isso, nos sentimos competentes e importantes. Onde essa frase atrapalha o processo de feedback?
+5. O fator emocional interfere no feedback. Explique.
+6. Como minimizamos a resitência ao feedback?
+7. Quais as habilidades de comunicação a serem desenvolvidas?
+8. O que é grupo e como ele se forma?
+9. O que um grupo precisa para ser eficaz?
+10. Qual a diferença entre clima e cultura de grupo?
+11. Porque o crescimento da produtividade não acompanha o crescimento do grupo?
+12. Qual a diferença emtre grupo e equipe?
+13. Quais os tipos de grupo e os seus subgrupos?
+14. Quais são as variáveis estruturais? Descreva
+========================================================================================
+RESPOSTAS:
+
+  FEEDBACK
+    .1: O feedback serve para melhorar o desempenho do grupo pois permite que as pessoas percebam suas falhas e dificuldades com mais clareza e, assim, procuram desenvolvimento pessoal para contorná-las.
+    
+    .2: Para que o feedback seja positivo, ele precisa de determinadas características: Precisa ser descritivo ao invés de avaliativo, ser o mais específico possível, devem ser focado em características que o receptor possa mudar, deve ser oportudo e bem esclarecido para que a comunicação seja precisa.
+    
+    .3: É díficil receber feedback pois dessa forma precisamos aceitar e admitir nossas fraquezas diante do grupo. Em função dessa dificuldade, encontramos algumas maneiras de nos defender que podem variar de pessoa para pessoa. Essas maneiras são: Parar de ouvir, negar a validade do feedback e agredir o comunicador expondo também seus defeitos.
+        
+    .4: É preciso tomar muito cuidado durante o processo de feedback para que ele não seja uma forma de se mostrar superior em relação ao receptor, o que  muitas vezes interfere no objetivo do feedback ser útil para quem recebe.
+    
+    .5: O fator emocional interfere no processo de feedback tanto do lado do comunicador quanto do receptor. O primeiro pode tratar o feedback como uma forma de desabafar sobre os erros e falhas do receptor, tendendo assim para uma agressão velada. Já o receptor pode não estar pronto psicologicamente para lidar com o feedback, ou nem ao menos sentir necessidade dele.
+    
+    .6: Podemos minimizar a resistência ao feedback estabelecendo uma relação de confiança, aprendendo a reagir ao feedback sem reações defensivas intensas  e a dar feedback sem conotações emocionais intensas.
+    
+    .7: Para melhorar a comunicação durante o feedback precisamos desenvolver algumas habilidades. São elas: Repetir o que o outro falou utilizando suas próprias palavras. Isso demonstra interesse e garante que a mensagem foi transmitida corretamente. Relatar ações específicas sem generalizar e relacioná-las a traços da personalidade. Aprender a verbalizar a sua percepção dos sentimentos do outro, e os seus próprios sentimentos.
+    
+  GRUPO 
+    .8: Um grupo é o conjunto de duas ou mais pessoas que interagem entre sí de forma que uma interfere no comportamento da outra. Um grupo se forma pela próximidade de características entre os indivíduos que estão relacionadas a característica geral do grupo e seu objetivo.
+        
+    .9: Para ser eficaz um grupo precisa atender ou superar a expectativa da empresa ou de quem o formou. Os integrantes precisam estar satisfeitos para que produzam o máximo possível e mantenham a saúde do grupo por mais tempo. E, por último, os integrantes precisam cooperar para atingir os objetivos e ajudar no crescimento pessoal de seus companheiros.
+        
+    10: Cultura de grupo é o resultado da interação dos membros que gera características apreciáveis no relacionamento entre eles. O clima de grupo refere-se as caracteristicas ambientais e psicosociais que afetam os membros do grupo durante o tempo que nele permanecem.
+        
+    11: O crescimento da produtividade não acompanha o crescimento do grupo pois o crescimento não deve ser automático, é preciso que os membros estejam  dispostos a atender novas atividades e a inserirem os novos integrantes no ambiente para que a produtividade mantenha proporcional ao que era antes do aumento de integrantes.
+    
+    12: Dentro de uma equipe, cada membro desenvolve uma função específica e altamente dependente do trabalho dos outros membros. Em um grupo essa interdependência não é tão grande.
+    
+    13: Os grupos podem ser formais, quando são criados por uma organização com um fim espefício, ou podem ser informais, quando os indivíduos unem-se por vontade própria. Um grupo pode dividir-se em 3 subgrupos: Uma facção horizontal, onde todos os membros possuem o mesmo cargo. Uma facção vertical, onde existe hierarquia entre os membros do grupo, e uma facção mista, onde existe uma diversidade de cargos e/ou esses cargos não importam para o funcionamento.
+        
+    14: Todo grupo contém variáveis estruturais que tendenciam o seu comportamento. São elas:
+    Papel: Todos os membros do grupo possuem uma função. As vezes a visão de determinado membro sobre seu papel é deturpada em relação ao que o grupo espera dele. Outras vezes o existem diferentes expectativas de diferentes partes do grupo em relação ao papel do indivíduo, o que gera um conflito de papéis.
+    As outras variáveis são normas, status, coesão e tamanho.

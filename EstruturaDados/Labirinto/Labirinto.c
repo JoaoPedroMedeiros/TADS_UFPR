@@ -268,11 +268,11 @@ void imprime_labirinto(Labirinto labirinto) {
   int x, y;
   for (y = 0; y <my; y++) {
     for (x = 0; x < mx; x++){
-      //printf("%c", caractere_posicao(&labirinto[x][y]));
-      desenho[count++] = caractere_posicao(&labirinto[x][y]);
+      printf("%c", caractere_posicao(&labirinto[x][y]));
+      //desenho[count++] = caractere_posicao(&labirinto[x][y]);
     }
-    desenho[count++] = '\n';
-    //printf("\n");
+    //desenho[count++] = '\n';
+    printf("\n");
   }
 
   printf("%s", desenho);
