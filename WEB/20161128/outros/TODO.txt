@@ -1,0 +1,5 @@
+PDF:
+  - Alterar o script para conter tabela de pagamento e campo de valor do kit.
+  - Alterar imagem do der para conter tabela de pagamento e campo de valor do kit.
+  - Alterar dicinário de tabelas para conter tabela de pagamento e campo de valor do kit.
+  - Alterar script para conter insert do usuário administrador
