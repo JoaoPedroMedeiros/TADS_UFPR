@@ -1,4 +1,0 @@
-Links utilizados
-https://www.leaseweb.com/labs/2015/10/creating-a-simple-rest-api-in-php/
-http://stackoverflow.com/questions/133925/javascript-post-request-like-a-form-submit
-http://forum.imasters.com.br/topic/365044-como-preencher-combobox-com-javascript/

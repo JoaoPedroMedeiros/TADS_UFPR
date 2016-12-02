@@ -1,8 +1,0 @@
-TODO
-  Detalhes
-    - Adicionar checkbox nos cartões. (feito)
-    - Não validar quando estiver vazio. (feito)
-    - Arrumar copyright das telas
-  
-  cadastrar.html
-    - Trocar input de parentesco por combobox e buscar os dados do banco

@@ -26,6 +26,16 @@
      * Executa um update/insert no banco.
      */
      public function result($sql);
+     
+    /**
+     * Executa um SQL no banco e retorna o resultado como objeto.
+     */
+     public function resultAsObject($sql);
+     
+    /**
+     * Executa um SQL no banco e retorna o resultado como array.
+     */
+     public function resultAsArray($sql);
   }
 ?>
 

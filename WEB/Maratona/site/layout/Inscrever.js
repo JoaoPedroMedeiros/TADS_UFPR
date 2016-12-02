@@ -35,6 +35,7 @@ function removeMascaraData(texto) {
  * Se retornar nulo, significa que a validação está OK.
  */
 function inscrever(form) {  
+  
   if (vazio(form.rbgKit       .value)) {
     mensagem("Selecione um kit");
     return false;
@@ -73,12 +74,6 @@ function inscrever(form) {
     return false;
   }
   
-  if (campoErro != null) {
-    mensagem("Campo " + campoErro.placeholder + " precisa estar preenchido corretamente.");
-    campoErro.focus();
-    return false;
-  }
-  
   var _rbgKit        = form.rbgKit       .value;
   var _cbxTamanho    = form.cbxTamanho   .value;
   var _rbgModalidade = form.rbgModalidade.value;
@@ -87,11 +82,10 @@ function inscrever(form) {
   var _fCodSeguranca = form.fCodSeguranca.value;
   var _fDataVal      = form.fDataVal     .value;
   var _fNome         = form.fNome        .value;
-  
-  $codAtleta = request.getSession().getAttribute("codAtleta");
+  var _fCodigo       = form.fCodigoAtleta.value;
   
   json = {"parametro": {
-     "cd_atleta": $codAtleta,
+     "cd_atleta": _fCodigo,
      "cd_mod"   : _rbgModalidade,
      "cd_kit"   : _rbgKit,
      "id_taman" : _cbxTamanho,
@@ -105,8 +99,10 @@ function inscrever(form) {
   
      function(resultado) {
        var retorno = JSON.parse(resultado);
-       if (retorno.codigo != 0)
-         mensagem(retorno.mensagem);
+       if (retorno.codigo != 0) {
+         var msg = retorno.mensagem;
+         mensagem(msg);
+       }
        else {
          window.location.href = "index.php";
          mensagem("Inscrição efetuada com sucesso!");
@@ -114,9 +110,10 @@ function inscrever(form) {
      })
      .fail(
        function(resultado) {
+         console.log(resultado);
          mensagem("Houve um erro ao efetuar a operação. Tente novamente mais tarde.");
        }
      );
   
-  return true;
+  return false;
 }

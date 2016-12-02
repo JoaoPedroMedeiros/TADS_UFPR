@@ -41,6 +41,7 @@
   
   $sqlValidaLogin = 
     "SELECT                          \n".
+    "  cd_atleta,                    \n".
     "  nm_atleta                     \n".
     "FROM                            \n".
     "  atleta                        \n".
@@ -48,15 +49,21 @@
     "    nm_login = '". $nm_login ."'\n".
     "and ds_senha = '". $ds_senha ."'\n";
 
-  $nome = DBFactory::getQuery()->singleResult($sqlValidaLogin);
+  $result = DBFactory::getQuery()->resultAsArray($sqlValidaLogin);
   
-  if ($nome == null) {
+  
+  
+  if (($result == null) || sizeof($result) == 0 || !isset($result[0]['cd_atleta']) || !isset($result[0]['nm_atleta'])) {
+    unset ($_SESSION['codigo']);
     unset ($_SESSION['nome']);
     header('location:../../layout/login.php?response="erro"');
     exit(0);
   }
   
   session_start();
+  $codigo = $result[0]['cd_atleta'];
+  $nome = $result[0]['nm_atleta'];
+  $_SESSION['codigo'] = $codigo;
   $_SESSION['nome'] = $nome;
   header('location:../../layout/index.php');
 ?>

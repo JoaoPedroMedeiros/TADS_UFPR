@@ -40,7 +40,7 @@
   //Recupera os parâmetros da requisição
   $param = JSONUtil::parameters($_SERVER);
   //Coloca como código da maratona se precisar.
-  $cd_marat = sizeof($param) > 0 ? $param[0] : 1;
+  $cd_marat = sizeof($param) > 0 ? $param[0] : 1; 
   
   $sql = 
     "SELECT                                \n

@@ -62,6 +62,38 @@ INSERT INTO modalidade(cd_mod, ds_mod, nr_dist, cd_marat) VALUES (2, "Intermedi√
 INSERT INTO modalidade(cd_mod, ds_mod, nr_dist, cd_marat) VALUES (3, "Avan√ßado"     , 42, 1);
 
 /*=========================================================*/
+/* modalidade                                              */
+/*=========================================================*/
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (1, "Geral Masculino 10km", "M", 16);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (2, "Geral Masculino 21km", "M", 16);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (3, "Geral Masculino 42km", "M", 16);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (4, "Geral Feminino 10km", "F", 16);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (5, "Geral Feminino 21km", "F", 16);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (6, "Geral Feminino 42km", "F", 16);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (7, "Masculino 10km acima de 60 anos", "M", 60);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (8, "Masculino 21km acima de 60 anos", "M", 60);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (9, "Masculino 42km acima de 60 anos", "M", 60);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (10, "Feminino 10km acima de 60 anos", "F", 60);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (11, "Feminino 21km acima de 60 anos", "F", 60);
+INSERT INTO Categoria (cd_categ, ds_categ, id_sexcat, nr_idamin) VALUES (12, "Feminino 42km acima de 60 anos", "F", 60);
+
+/*=========================================================*/
+/* Modalidade_categorias                                   */
+/*=========================================================*/
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (1, 1);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (1, 4);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (1, 7);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (1, 10);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (2, 2);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (2, 5);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (2, 8);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (2, 11);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (3, 3);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (3, 6);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (3, 9);
+INSERT INTO Modalidade_Categorias (cd_mod, cd_categ) VALUES (3, 12);
+
+/*=========================================================*/
 /* Administrador                                           */
 /*=========================================================*/
 INSERT INTO atleta (nm_atleta, nr_rg, nr_cpf, id_sexo, id_estran, dt_nasc, ds_email, nr_tel, nm_login, ds_senha) 

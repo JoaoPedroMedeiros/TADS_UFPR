@@ -9,6 +9,15 @@
           unset($_SESSION['nome']);
        else
          $logado = $_SESSION['nome'];
+       
+       $codigo = '';
+       if (!isset ($_SESSION['codigo']))
+          unset($_SESSION['codigo']);
+       else
+         $codigo = $_SESSION['codigo'];
+       
+       if ($codigo == 1)
+         header('location:admin.php');
     ?> 
 
     <meta charset="utf-8">
@@ -54,23 +63,23 @@
                         <a href="index.php">Inicial</a>
                     </li>
                     <li>
-                        <a href="index.php">Percursos</a>
+                        <a href="#Ancora1">Percursos</a>
                     </li>
                     <li>
-                        <a href="index.php">Informações</a>
+                        <a href="#Ancora2">Kits</a>
                     </li>
                     <li>
-                        <a href="index.php">Kits</a>
+                        <a href="#Ancora3">Informações</a>
                     </li>
                     <li>
-                        <a href="index.php">Resultados</a>
+                        <a href="resultados.php">Resultados</a>
                     </li>
                     <?php
                       $usuarioLogado = $logado != '';
                       if ($usuarioLogado) {
                         echo 
                            '<li>                                     '.
-                           '  <a href="inscrever.html">Participar</a>'.
+                           '  <a href="inscrever.php">Participar</a>'.
                            '</li>';
                         echo 
                            '<li>                                     '.
@@ -93,6 +102,7 @@
     <div class="container">
 
         <div class="row">
+			<a name="Ancora1"></a> 		
             <div class="box">
                 <div class="col-lg-12 text-center">
                     <div id="carousel-example-generic" class="carousel slide">
@@ -121,6 +131,7 @@
         </div>
 
         <div class="row">
+			<a name="Ancora2"></a>
             <div class="box">
                 <div class="col-lg-12 text-center">
                     <hr>
@@ -152,6 +163,7 @@
         </div>
 
         <div class="row">
+			<a name="Ancora3"></a>
             <div class="box">
                 <div class="col-lg-12">
                     <hr>

@@ -48,6 +48,28 @@
       return $this->simpleExec($conn, $sql);
     }
     
+    public function resultAsObject($sql) {
+      $conn = $this->getConnection();
+      $result = $this->simpleExec($conn, $sql);
+      
+      $arrObj = array();
+      for ($i=0; $i < $conn->rowsNumber($result); $i++)
+        $arrObj[$i] = $conn->fetchObject($result);
+      
+      return $arrObj;
+    }
+    
+    public function resultAsArray($sql) {
+      $conn = $this->getConnection();
+      $result = $this->simpleExec($conn, $sql);
+      
+      $arr = array();
+      for ($i=0; $i < $conn->rowsNumber($result); $i++)
+        $arr[$i] = $conn->fetchArray($result);
+      
+      return $arr;
+    }
+    
     public function getConnection() {
       return new MySQLConnection();
     }
